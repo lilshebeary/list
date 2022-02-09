@@ -1,13 +1,9 @@
 #!/usr/bin/env node
-// import chalk from 'chalk';
 
 const fs = require('fs');
 const util = require('util');  
 const chalk = require('chalk');
-// chalk.enabled = true;
-// chalk.level = 3;
-
-FORCE_COLOR=true
+const path = require('path');
 
 // method #2
 // const lstat = util.promisify(fs.lstat);
@@ -15,13 +11,15 @@ FORCE_COLOR=true
 // method #3
 const { lstat } = fs.promises;
 
-fs.readdir(process.cwd(), async (err, filenames) => {
+const targetDir = process.argv[2] || process.cwd();
+
+fs.readdir(targetDir, async (err, filenames) => {
     if (err) {
        console.log(err);
     }
 
     const statPromises = filenames.map(filename => {
-        return lstat(filename);
+        return lstat(path.join(targetDir, filename));
     });
 
     const allStats = await Promise.all(statPromises);
@@ -32,7 +30,7 @@ fs.readdir(process.cwd(), async (err, filenames) => {
         if(stats.isFile()) {
             console.log(chalk.magentaBright(filenames[index]))
         } else {
-            console.log(chalk.bold(filenames[index]));
+            console.log(chalk.blue.bold(filenames[index]));
         }
 
     }
@@ -50,4 +48,6 @@ fs.readdir(process.cwd(), async (err, filenames) => {
 //         })
 //     })
 // }
+
+
 
